@@ -1,6 +1,6 @@
 import { Stack, styled } from "@mui/material";
 import "./App.css";
-import Chats from "./components/Chats";
+import Chat from "./components/Chat";
 import Detail from "./components/Detail";
 import List from "./components/List";
 
@@ -20,7 +20,7 @@ function App() {
   return (
     <Container>
       <List />
-      <Chats />
+      <Chat />
       <Detail />
     </Container>
   );
