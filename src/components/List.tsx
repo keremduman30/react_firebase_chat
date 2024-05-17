@@ -1,10 +1,13 @@
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
+import UserInfo from "./UserInfo";
+import ChatList from "./ChatList";
 
 const List = () => {
   return (
-    <Box sx={{ flex: "1" }}>
-      <Stack>List</Stack>
-    </Box>
+    <Stack sx={{ flex: "1" }}>
+      <UserInfo />
+      <ChatList />
+    </Stack>
   );
 };
 
