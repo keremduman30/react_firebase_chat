@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Container = styled(Box)({
   flex: "2",
@@ -51,16 +51,16 @@ const CenterStack = styled(Stack)({
   "&::-webkit-scrollbar": {
     //baslangıc scroll ayarları
     width: "10px",
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(17, 25, 40, 0.5)",
   },
-  " &::-webkit-scrollbar-track": {
+  /*  " &::-webkit-scrollbar-track": {
     //arka renk
     backgroundColor: "transparent",
-  },
+  }, */
   " &::-webkit-scrollbar-thumb": {
     //arkasındaki color
 
-    backgroundColor: "rgba(17, 25, 40, 0.5)",
+    backgroundColor: "grey",
   },
   gap: "20px",
 });
@@ -74,6 +74,12 @@ const StyledMsgTypography = styled(Typography)({
 const Chat = () => {
   const [openEmoji, setOpenEmoji] = useState<boolean>(false);
   const [textMsg, setTextMsg] = useState<string>("");
+
+  const endRef = useRef<null | HTMLDivElement>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const handlerEmoji = (e: EmojiClickData) => {
     setTextMsg(textMsg + e.emoji);
@@ -201,6 +207,7 @@ const Chat = () => {
             <Typography sx={{ fontSize: "13px" }}>1 min ago</Typography>
           </Stack>
         </Box>
+        <Box ref={endRef}></Box>
       </CenterStack>
       <Stack
         sx={{
