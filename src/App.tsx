@@ -7,7 +7,7 @@ import List from "./components/List";
 const Container = styled(Stack)({
   display: "flex",
   flexDirection: "row",
-  width: "90vw",
+  width: "80vw",
   height: "90vh",
   backgroundColor: "rgba(17, 25, 40, 0.75)",
   backdropFilter:
