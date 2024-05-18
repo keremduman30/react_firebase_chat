@@ -9,6 +9,25 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useState } from "react";
 import ChatListItem from "./ChatListItem";
+import AddUserAlert from "./AddUserAlert";
+
+const StyledContainer = styled(Box)({
+  display: "flex",
+  padding: "0 20px",
+  flexDirection: "column",
+  overflowY: "scroll",
+  "&::-webkit-scrollbar": {
+    width: "5px",
+    backgroundColor: "transparent",
+  },
+  " &::-webkit-scrollbar-track": {
+    backgroundColor: "transparent",
+  },
+  " &::-webkit-scrollbar-thumb": {
+    backgroundColor: "rgba(17, 25, 40, 0.5)",
+  },
+});
+
 const StyledTextField = styled(TextField)({
   "& .MuiInputBase-root": {
     height: "30px",
@@ -18,6 +37,7 @@ const StyledTextField = styled(TextField)({
     backgroundColor: "rgba(17, 25, 40, 0.5)",
     outline: "none",
     border: "none",
+    color: "white",
   },
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
@@ -38,36 +58,9 @@ const StyledBox = styled(Box)({
 
 const ChatList = () => {
   const [addMode, setMode] = useState<boolean>(false);
-  // Kaydırma tetikleyicisi
-  /*   const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 0,
-  }); */
 
-  // Kaydırma çubuğu stilleri
   return (
-    <Box
-      sx={{
-        display: "flex",
-        padding: "0 20px",
-        flexDirection: "column",
-        overflowY: "scroll",
-        "&::-webkit-scrollbar": {
-          //baslangıc scroll ayarları
-          width: "5px",
-          backgroundColor: "transparent",
-        },
-        " &::-webkit-scrollbar-track": {
-          //arka renk
-          backgroundColor: "transparent",
-        },
-        " &::-webkit-scrollbar-thumb": {
-          //arkasındaki color
-
-          backgroundColor: "rgba(17, 25, 40, 0.5)",
-        },
-      }}
-    >
+    <StyledContainer>
       <Stack
         direction={"row"}
         sx={{
@@ -102,7 +95,8 @@ const ChatList = () => {
         <ChatListItem />
         <ChatListItem />
       </List>
-    </Box>
+      <AddUserAlert addMode={addMode} setMode={setMode} />
+    </StyledContainer>
   );
 };
 

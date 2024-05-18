@@ -7,6 +7,7 @@ import {
   Button,
   CardHeader,
   Divider,
+  IconButton,
   Stack,
   Typography,
   styled,
@@ -131,15 +132,12 @@ const Detail = () => {
           >
             Accordion 1
           </AccordionSummary>
-          <AccordionDetails sx={{ padding: "0 10px", margin: "0" }}>
+          <AccordionDetails sx={{ padding: "0 10px" }}>
             {Array.from({ length: 2 }, (i) => (
               <CardHeader
                 sx={{
                   width: "100%",
-                  margin: "0",
-                  padding: "0 5px",
-
-                  height: "50px",
+                  padding: "10px 5px",
                 }}
                 avatar={
                   <Avatar
@@ -153,6 +151,20 @@ const Detail = () => {
                     }}
                     aria-label="recipe"
                   />
+                }
+                action={
+                  <IconButton>
+                    <ExpandMoreIcon
+                      sx={{
+                        width: "30px",
+                        height: "30px",
+                        backgroundColor: "rgba(17, 25, 40, 0.5)",
+                        borderRadius: "50%",
+                        color: "white",
+                        padding: "5px",
+                      }}
+                    />
+                  </IconButton>
                 }
                 title={
                   <Typography variant="h6" fontSize={14}>
