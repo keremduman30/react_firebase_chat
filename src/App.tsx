@@ -3,6 +3,8 @@ import "./App.css";
 import Chat from "./components/Chat";
 import Detail from "./components/Detail";
 import List from "./components/List";
+import Login from "./components/Login";
+import Notifications from "./components/Notifications";
 
 const Container = styled(Stack)({
   display: "flex",
@@ -14,14 +16,23 @@ const Container = styled(Stack)({
     "blur(19px) saturate(180%)" /*background  blur and saturate */,
   borderRadius: "12px",
   border: "1px solid rgba(255, 255, 255, 0.125)",
+  overflowX: "hidden",
 });
 
 function App() {
+  const user = false;
   return (
     <Container>
-      <List />
-      <Chat />
-      <Detail />
+      {user ? (
+        <>
+          <List />
+          <Chat />
+          <Detail />
+        </>
+      ) : (
+        <Login />
+      )}
+      <Notifications />
     </Container>
   );
 }
