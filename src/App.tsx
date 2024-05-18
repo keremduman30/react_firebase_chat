@@ -20,7 +20,7 @@ const Container = styled(Stack)({
 });
 
 function App() {
-  const user = false;
+  const user = true;
   return (
     <Container>
       {user ? (

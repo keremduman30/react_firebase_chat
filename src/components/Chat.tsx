@@ -71,7 +71,7 @@ const StyledMsgTypography = styled(Typography)({
   color: "white",
 });
 
-const Chat = () => {
+const Chat = () => {""
   const [openEmoji, setOpenEmoji] = useState<boolean>(false);
   const [textMsg, setTextMsg] = useState<string>("");
 

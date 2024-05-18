@@ -17,12 +17,7 @@ const ChatListItem = () => {
         <ListItemText
           primary="Brunch this weekend?"
           secondary={
-            <Typography
-              sx={{ display: "inline" }}
-              component="span"
-              variant="body2"
-              color="text.primary"
-            >
+            <Typography sx={{ fontSize: "12px", fontWeight: "200px" }}>
               Ali Connors
             </Typography>
           }
