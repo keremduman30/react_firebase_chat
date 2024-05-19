@@ -12,7 +12,7 @@ const ChatListItem = () => {
     <>
       <ListItem sx={{ padding: "10px 0px" }}>
         <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+          <Avatar alt="Remy Sharp" src="/avatar.png" />
         </ListItemAvatar>
         <ListItemText
           primary="Brunch this weekend?"
@@ -23,7 +23,11 @@ const ChatListItem = () => {
           }
         />
       </ListItem>
-      <Divider variant="fullWidth" component="li" />
+      <Divider
+        variant="fullWidth"
+        component="li"
+        sx={{ backgroundColor: "GrayText" }}
+      />
     </>
   );
 };

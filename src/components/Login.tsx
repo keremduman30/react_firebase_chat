@@ -12,6 +12,13 @@ import {
 import { red } from "@mui/material/colors";
 import { ChangeEvent, useState } from "react";
 import { toast } from "react-toastify";
+import { auth, db } from "../libs/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import upload from "../libs/upload";
 
 const StyledContainer = styled(Box)({
   width: "100%",
@@ -81,6 +88,8 @@ const Login = () => {
     url: "",
   });
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setAvatarImg({
@@ -89,13 +98,59 @@ const Login = () => {
       });
     }
   };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("kerem");
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const { username, email, password } = Object.fromEntries(formData);
+
+    try {
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        email as string,
+        password as string
+      );
+
+      const imgUrl = await upload(avatar.file);
+
+      await setDoc(doc(db, "users", res.user.uid), {
+        username,
+        email,
+        id: res.user.uid,
+        avatar: imgUrl || null,
+        blocked: [],
+      });
+      await setDoc(doc(db, "userchats", res.user.uid), {
+        chats: [],
+      });
+      toast.success("Account created! u can login");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const { email, password } = Object.fromEntries(formData);
+      await signInWithEmailAndPassword(
+        auth,
+        email as string,
+        password as string
+      );
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
 
     toast.warn("hello");
   };
+
   return (
     <StyledContainer>
       <StyledItem>
@@ -111,13 +166,15 @@ const Login = () => {
             placeholder="password"
             name="password"
           />
-          <StyledLoginButton type="submit">Sign In</StyledLoginButton>
+          <StyledLoginButton type="submit" disabled={loading}>
+            {loading ? "loading..." : "Sign In"}
+          </StyledLoginButton>
         </StyledForm>
       </StyledItem>
       <Divider orientation="vertical" sx={{ bgcolor: "grey", height: "80%" }} />
       <StyledItem>
         <Typography variant="h5">Create An Account</Typography>
-        <StyledForm onSubmit={handleSubmit}>
+        <StyledForm onSubmit={handleRegister}>
           <CardHeader
             sx={{ padding: "0px", margin: "0px" }}
             avatar={
@@ -154,7 +211,7 @@ const Login = () => {
           <StyledTextField
             variant="outlined"
             placeholder="user name"
-            name="userName"
+            name="username"
           />
           <StyledTextField
             variant="outlined"
@@ -164,10 +221,15 @@ const Login = () => {
           <StyledTextField
             variant="outlined"
             placeholder="password"
+            type="password"
             name="password"
           />
-          <StyledLoginButton variant="contained" type="submit">
-            Sign Up
+          <StyledLoginButton
+            variant="contained"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "loading..." : "Sign Up"}
           </StyledLoginButton>
         </StyledForm>
       </StyledItem>
