@@ -1,10 +1,14 @@
-import { Stack, styled } from "@mui/material";
+import { Box, Stack, Typography, styled } from "@mui/material";
 import "./App.css";
 import Chat from "./components/Chat";
 import Detail from "./components/Detail";
 import List from "./components/List";
 import Login from "./components/Login";
 import Notifications from "./components/Notifications";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./libs/firebase";
+import { useUserStore } from "./libs/userStore";
 
 const Container = styled(Stack)({
   display: "flex",
@@ -20,10 +24,37 @@ const Container = styled(Stack)({
 });
 
 function App() {
-  const user = false;
+  const { currentUser, isLoading, fethcUserInfo } = useUserStore();
+
+  useEffect(() => {
+    const unSub = onAuthStateChanged(auth, (user) => {
+      fethcUserInfo(user?.uid);
+    });
+    return () => {
+      unSub();
+    };
+  }, [fethcUserInfo]);
+
+  console.log(currentUser);
+
+  if (isLoading)
+    return (
+      <Typography
+        variant="h4"
+        sx={{
+          color: "white",
+          padding: "20px",
+          textAlign: "center",
+          bgcolor: "rgba(20, 25, 34, 0.823)",
+        }}
+      >
+        Loading....
+      </Typography>
+    );
+
   return (
     <Container>
-      {user ? (
+      {currentUser ? (
         <>
           <List />
           <Chat />

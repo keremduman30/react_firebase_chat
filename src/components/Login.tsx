@@ -70,6 +70,7 @@ const StyledLoginButton = styled(Button)({
   height: "0px",
   boxShadow: "none",
   color: "white",
+  textTransform: "capitalize",
   backgroundColor: "#1f8ef1",
   "&:hover": {
     backgroundColor: "#1f8ef1",
@@ -125,7 +126,9 @@ const Login = () => {
       });
       toast.success("Account created! u can login");
     } catch (error) {
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -143,12 +146,12 @@ const Login = () => {
         password as string
       );
     } catch (error) {
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
-
-    toast.warn("hello");
   };
 
   return (

@@ -7,9 +7,12 @@ import {
   styled,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatListItem from "./ChatListItem";
 import AddUserAlert from "./AddUserAlert";
+import { User, useUserStore } from "../libs/userStore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../libs/firebase";
 
 const StyledContainer = styled(Box)({
   display: "flex",
@@ -56,8 +59,59 @@ const StyledBox = styled(Box)({
   cursor: "pointer",
 });
 
+type ChatDoc = {
+  receiverId: string;
+  updatedAt: number;
+};
+
+export type Chat = ChatDoc & {
+  chatId?: string;
+  lastMessage?: string;
+  user: User;
+};
+
 const ChatList = () => {
   const [addMode, setMode] = useState<boolean>(false);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const { currentUser } = useUserStore();
+  /* 
+
+const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
+    console.log("Current data: ", doc.data());
+});
+
+*/
+  useEffect(() => {
+    if (currentUser) {
+      const unSub = onSnapshot(
+        doc(db, "userchats", currentUser?.id),
+        async (res) => {
+          const items = res.data(); //burada tum userchatsi alacaz ama orada receivedId var direk user bilgils yok
+          //user bilgisi oraya kaydetmedik cunku kullanıcı profil ve isim degistirirse direk yansımıyacak o yuzden biz id ile
+          //bu userları hepsini alıp setChatse ekliyecez
+
+          if (items) {
+            const chats = items.chats as ChatDoc[];
+            const promisess = chats.map(async (item: ChatDoc) => {
+              const userDocRef = doc(db, "users", item.receiverId);
+              const userDocSnap = await getDoc(userDocRef);
+              const user = userDocSnap.data() as User;
+              return {
+                ...item,
+                user,
+              };
+            });
+            const chatData = await Promise.all(promisess);
+            setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+          }
+        }
+      );
+
+      return () => {
+        unSub();
+      };
+    }
+  }, [currentUser]);
 
   return (
     <StyledContainer>
@@ -91,10 +145,14 @@ const ChatList = () => {
           />
         </StyledBox>
       </Stack>
-      <List sx={{ height: "100%" }}>
-        <ChatListItem />
-        <ChatListItem />
-      </List>
+      {chats.length > 0 && (
+        <List sx={{ height: "100%" }}>
+          {chats.map((e: Chat) => (
+            <ChatListItem key={crypto.randomUUID()} chatItem={e} />
+          ))}
+        </List>
+      )}
+
       <AddUserAlert addMode={addMode} setMode={setMode} />
     </StyledContainer>
   );

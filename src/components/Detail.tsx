@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import DetailAccordionItem from "./DetailAccordionItem";
+import { auth } from "../libs/firebase";
 
 const StyledBox = styled(Box)({
   flex: "1",
@@ -36,6 +36,10 @@ const StyledBox = styled(Box)({
 });
 
 const Detail = () => {
+  const handlerLogout = async () => {
+    await auth.signOut();
+  };
+
   return (
     <StyledBox>
       <Stack>
@@ -73,8 +77,9 @@ const Detail = () => {
         />
         <Divider variant="fullWidth" sx={{ bgcolor: "grey", mb: "10px" }} />
         <Stack sx={{ gap: "0px" }}>
-          {Array.from({ length: 3 }, (i) => (
+          {Array.from({ length: 3 }, () => (
             <Accordion
+              key={crypto.randomUUID()}
               sx={{
                 backgroundColor: "transparent",
                 color: "white",
@@ -133,8 +138,9 @@ const Detail = () => {
             Accordion 1
           </AccordionSummary>
           <AccordionDetails sx={{ padding: "0 10px" }}>
-            {Array.from({ length: 2 }, (i) => (
+            {Array.from({ length: 2 }, () => (
               <CardHeader
+                key={crypto.randomUUID()}
                 sx={{
                   width: "100%",
                   padding: "10px 5px",
@@ -225,6 +231,7 @@ const Detail = () => {
               bgcolor: "#3a63cb",
               "&:hover": { bgcolor: "#3a63cb", boxShadow: "0" },
             }}
+            onClick={handlerLogout}
           >
             Logout
           </Button>

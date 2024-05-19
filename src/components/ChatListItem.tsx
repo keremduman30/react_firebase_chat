@@ -6,19 +6,25 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { Chat } from "./ChatList";
 
-const ChatListItem = () => {
+type prop = {
+  chatItem: Chat;
+};
+const ChatListItem = ({ chatItem }: prop) => {
   return (
     <>
       <ListItem sx={{ padding: "10px 0px" }}>
         <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/avatar.png" />
+          <Avatar
+            alt="Remy Sharp"
+            src={chatItem.user.avatar || "/avatar.png"}
+          />
         </ListItemAvatar>
         <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
+          primary={
             <Typography sx={{ fontSize: "12px", fontWeight: "200px" }}>
-              Ali Connors
+              {chatItem.user.username}
             </Typography>
           }
         />
