@@ -11,6 +11,20 @@ import {
   Typography,
   styled,
 } from "@mui/material";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { db } from "../libs/firebase";
+import { User, useUserStore } from "../libs/userStore";
+import { useState } from "react";
 const StyledTextFieldAddUser = styled(TextField)({
   "& .MuiInputBase-root": {
     backgroundColor: "white !important",
@@ -29,6 +43,57 @@ type prop = {
 };
 
 const AddUserAlert = ({ addMode, setMode }: prop) => {
+  const [searchUsers, setSearchUsers] = useState<User | null>(null);
+
+  const { currentUser } = useUserStore();
+
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const q = query(
+      collection(db, "users"),
+      where("username", "==", formData.get("username"))
+    );
+    const querySnapShot = await getDocs(q);
+    if (!querySnapShot.empty) {
+      setSearchUsers(querySnapShot.docs[0].data() as User);
+    }
+  };
+
+  const handleAdd = async () => {
+    try {
+      const chatRef = collection(db, "chats");
+      const userRef = collection(db, "userchats");
+      //burada chat collectionu yarataz ve bunun idside lzım tum mesajları almak için
+      const newChatRef = doc(chatRef);
+      // const userChatsRef = doc(db, "userchats");
+      await setDoc(newChatRef, {
+        createdAt: serverTimestamp(),
+        messages: [],
+      });
+      //simdi eklenen userin idsini userchats ta ekliyelim ikisi için
+      await updateDoc(doc(userRef, currentUser?.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastMessage: "",
+          receiverId: searchUsers?.id,
+          updateAt: Date.now(),
+        }),
+      });
+
+      await updateDoc(doc(userRef, searchUsers?.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastMessage: "",
+          receiverId: currentUser?.id,
+          updateAt: Date.now(),
+        }),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box>
       <Modal
@@ -43,14 +108,14 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
           justifyContent: "center",
         }}
       >
-        <form action="">
-          <Stack
-            sx={{
-              backgroundColor: "rgba(17, 17, 17, 0.781)",
-              borderRadius: "10px",
-              padding: "35px",
-            }}
-          >
+        <Stack
+          sx={{
+            backgroundColor: "rgba(17, 17, 17, 0.781)",
+            borderRadius: "10px",
+            padding: "35px",
+          }}
+        >
+          <form action="" onSubmit={handleSearch}>
             <Stack direction={"row"} gap={2}>
               <StyledTextFieldAddUser
                 variant="outlined"
@@ -65,14 +130,17 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
                   color: "white",
                   textTransform: "capitalize",
                 }}
+                type="submit"
               >
                 Search
               </Button>
             </Stack>
-
+          </form>
+          {searchUsers && (
             <Card
+              key={crypto.randomUUID()}
               sx={{
-                marginTop: "40px",
+                marginTop: "20px",
                 bgcolor: "transparent",
               }}
             >
@@ -82,37 +150,42 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "100%",
-                  padding: "10px 0px",
+                  padding: "5px 0px",
                 }}
                 avatar={
                   <Avatar
-                    // src="/avatar.png"
+                    src={searchUsers.avatar || "/avatar.png"}
                     // sx={{ bgcolor: red[500] }}
                     aria-label="recipe"
                   ></Avatar>
                 }
                 action={
-                  <IconButton>
-                    <Button
+                  <IconButton onClick={handleAdd}>
+                    <Box
                       sx={{
                         backgroundColor: "#1a73e8",
                         "&:hover": { backgroundColor: "#1a73e8" },
+                        padding: "10px",
                         borderRadius: "10px",
+                        border: "none",
                         color: "white",
                         textTransform: "capitalize",
+                        fontSize: "12px",
                       }}
                     >
                       Add User
-                    </Button>
+                    </Box>
                   </IconButton>
                 }
                 title={
-                  <Typography sx={{ color: "white" }}>John doe</Typography>
+                  <Typography sx={{ color: "white" }}>
+                    {searchUsers.username}
+                  </Typography>
                 }
               />
             </Card>
-          </Stack>
-        </form>
+          )}
+        </Stack>
       </Modal>
     </Box>
   );

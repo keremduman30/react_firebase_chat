@@ -7,14 +7,16 @@ import {
   Typography,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
+import { useUserStore } from "../libs/userStore";
 
 const UserInfo = () => {
+  const { currentUser } = useUserStore();
   return (
     <Box>
       <CardHeader
         avatar={
           <Avatar
-            src="/avatar.png"
+            src={currentUser?.avatar || "/avatar.png"}
             sx={{ bgcolor: red[500] }}
             aria-label="recipe"
           />
@@ -39,7 +41,7 @@ const UserInfo = () => {
             </IconButton>
           </Stack>
         }
-        title={<Typography variant="h5">John Doe</Typography>}
+        title={<Typography variant="h5">{currentUser?.username}</Typography>}
       />
     </Box>
   );
