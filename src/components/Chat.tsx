@@ -12,7 +12,20 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { db } from "../libs/firebase";
+import { Chats, Message, useChatStore } from "../libs/chatStore";
+import { useUserStore } from "../libs/userStore";
+import { AvatarObjectURl } from "./Login";
+import upload from "../libs/upload";
+import { TDate, format } from "timeago.js";
 
 const Container = styled(Box)({
   flex: "2",
@@ -70,20 +83,101 @@ const StyledMsgTypography = styled(Typography)({
   borderRadius: "20px",
   color: "white",
 });
+const VisuallyHiddenInput = styled("input")({
+  display: "none",
+});
 
-const Chat = () => {""
+const Chat = () => {
   const [openEmoji, setOpenEmoji] = useState<boolean>(false);
   const [textMsg, setTextMsg] = useState<string>("");
+  const [chats, setChats] = useState<Message | null>(null);
+  const [avatar, setAvatarImg] = useState<AvatarObjectURl>({
+    file: null,
+    url: "",
+  });
 
   const endRef = useRef<null | HTMLDivElement>(null);
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  }, [chats?.messages]);
+
+  useEffect(() => {
+    if (chatId) {
+      const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+        if (res.data()) {
+          const messages = res.data() as Message;
+          setChats(messages);
+        }
+      });
+      return () => {
+        unSub();
+      };
+    }
+  }, [chatId]);
 
   const handlerEmoji = (e: EmojiClickData) => {
     setTextMsg(textMsg + e.emoji);
     setOpenEmoji(false);
+  };
+
+  const handleSend = async () => {
+    if (textMsg === "") return;
+    let imgUrl: File | null = null;
+    try {
+      if (avatar.file) {
+        imgUrl = (await upload(avatar.file)) as File;
+      }
+
+      if (chatId) {
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            senderId: currentUser?.id,
+            text: textMsg,
+            createdAt: new Date(),
+            ...(imgUrl && { img: imgUrl }),
+          }),
+        });
+      }
+
+      const userIDs = [currentUser?.id, user?.id];
+
+      userIDs.forEach(async (id) => {
+        //simdi son atılan mesajı guncelliyelim
+        if (id) {
+          const userChatsRef = doc(db, "userchats", id);
+          const userChatsSnapshot = await getDoc(userChatsRef);
+          if (userChatsSnapshot.exists()) {
+            const userChatsData = userChatsSnapshot.data();
+            const userChats: Chats[] = userChatsData.chats;
+
+            const chatIndex = userChats.findIndex((c) => c.chatId === chatId);
+            userChatsData.chats[chatIndex].lastMessage = textMsg;
+            userChatsData.chats[chatIndex].isSeen =
+              id === currentUser?.id ? true : false;
+            userChatsData.chats[chatIndex].updatedAt = Date.now();
+            await updateDoc(userChatsRef, {
+              chats: userChatsData.chats,
+            });
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    setAvatarImg({ url: "", file: null });
+    setTextMsg("");
+  };
+
+  const handleImg = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setAvatarImg({
+        file: e.target.files![0],
+        url: URL.createObjectURL(e.target.files![0]),
+      });
+    }
   };
 
   return (
@@ -91,7 +185,7 @@ const Chat = () => {""
       <CardHeader
         avatar={
           <Avatar
-            src="/avatar.png"
+            src={user?.avatar || "/avatar.png"}
             sx={{
               bgcolor: red[500],
               width: "50px",
@@ -123,68 +217,92 @@ const Chat = () => {""
         }
         title={
           <Typography variant="h6" fontSize={18}>
-            John Doe
+            {user?.username}
           </Typography>
         }
         subheader="September 14, 2016"
       />
       <Divider variant="fullWidth" sx={{ bgcolor: "grey" }} />
       <CenterStack>
-        <CardHeader
-          sx={{
-            maxWidth: "70%",
-            padding: "0",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "start",
-          }}
-          avatar={
-            <Avatar
-              src="/avatar.png"
-              sx={{
-                bgcolor: red[500],
-                width: "30px",
-                height: "30px",
-                objectFit: "cover",
-              }}
-              aria-label="recipe"
-            />
-          }
-          title={
-            <StyledMsgTypography
-              sx={{
-                backgroundColor: "rgba(17,25,40,0.3)",
-                borderRadius: "10px",
-                marginBottom: "5px",
-              }}
-            >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. In nemo
-              ducimus dolorum corrupti, perspiciatis exercitationem. Ducimus
-              atque ipsa quae sint praesentium, mollitia qui delectus laboriosam
-              unde laborum perspiciatis veritatis dolorem alias commodi quasi
-              voluptatibus deleniti ad nihil similique aspernatur voluptas
-              consequuntur ipsam beatae exercitationem. Neque ipsam illum
-              dolores tempora hic.
-            </StyledMsgTypography>
-          }
-          subheader={
-            <Typography sx={{ fontSize: "13px" }}>1 min ago</Typography>
-          }
-        />
-        <Box
-          sx={{
-            alignSelf: "flex-end",
-            maxWidth: "70%",
-          }}
-        >
-          <Stack
+        {chats &&
+          chats.messages.map((message) => {
+            const currentMsg = message.senderId === currentUser?.id;
+            return (
+              <>
+                <CardHeader
+                  key={crypto.randomUUID()}
+                  sx={{
+                    alignSelf: currentMsg ? "flex-end" : "flex-start",
+                    maxWidth: "70%",
+                    padding: "0",
+                    alignItems: "start",
+                  }}
+                  avatar={
+                    currentMsg && (
+                      <Avatar
+                        src={(!currentMsg && user?.avatar) || "avatar.png"}
+                        aria-label="recipe"
+                        sx={{
+                          bgcolor: red[500],
+                          width: "30px",
+                          height: "30px",
+                          objectFit: "cover",
+                          display: currentMsg && "none",
+                        }}
+                      />
+                    )
+                  }
+                  title={
+                    <StyledMsgTypography
+                      sx={{
+                        backgroundColor: currentMsg
+                          ? "#3a63cb"
+                          : "rgba(17,25,40,0.3)",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      {message.text}
+                    </StyledMsgTypography>
+                  }
+                  subheader={
+                    <Typography sx={{ fontSize: "13px", mt: "5px" }}>
+                      {format(message.createdAt as TDate)}
+                    </Typography>
+                  }
+                />
+                {message.img && (
+                  <Box
+                    sx={{
+                      maxWidth: "70%",
+                      display: "flex",
+                      alignSelf: currentMsg ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <img
+                      src={message.img}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "300px",
+                        borderRadius: "10px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
+            );
+          })}
+        {avatar.url && (
+          <Box
             sx={{
-              flex: "1",
-              gap: "5px",
+              maxWidth: "70%",
+              display: "flex",
+              alignSelf: "flex-end",
             }}
           >
             <img
-              src="https://cdn.pixabay.com/photo/2024/04/28/07/00/bird-8724916_1280.jpg"
+              src={avatar.url}
               alt=""
               style={{
                 width: "100%",
@@ -193,20 +311,9 @@ const Chat = () => {""
                 objectFit: "cover",
               }}
             />
-            <StyledMsgTypography
-              sx={{ backgroundColor: "#3a63cb", borderRadius: "10px" }}
-            >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Architecto nostrum ipsum illo optio. Cupiditate fugiat magnam quas
-              laboriosam, hic iste nesciunt laudantium voluptates mollitia est
-              minus optio nihil consectetur dolorum tempora officiis iusto
-              aliquid modi expedita maxime consequuntur possimus. At quidem
-              aspernatur molestiae sint corrupti eveniet accusantium ab placeat
-              praesentium.
-            </StyledMsgTypography>
-            <Typography sx={{ fontSize: "13px" }}>1 min ago</Typography>
-          </Stack>
-        </Box>
+          </Box>
+        )}
+
         <Box ref={endRef}></Box>
       </CenterStack>
       <Stack
@@ -221,7 +328,10 @@ const Chat = () => {""
         }}
       >
         <Stack direction={"row"} sx={{ gap: "20px" }}>
-          <StyledImg src="/img.png" alt="" />
+          <Typography htmlFor="file" component={"label"}>
+            <StyledImg src="/img.png" alt="" />
+          </Typography>
+          <VisuallyHiddenInput type="file" id="file" onChange={handleImg} />
           <StyledImg src="/camera.png" alt="" />
           <StyledImg src="/mic.png" alt="" />
         </Stack>
@@ -250,6 +360,7 @@ const Chat = () => {""
             border: "none",
             ":hover": { backgroundColor: "#2c5ace", border: "none" },
           }}
+          onClick={handleSend}
         >
           Send
         </Button>

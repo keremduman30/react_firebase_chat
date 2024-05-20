@@ -6,15 +6,50 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { Chat } from "./ChatList";
+import { Chats, useChatStore } from "../libs/chatStore";
+import { useUserStore } from "../libs/userStore";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../libs/firebase";
 
 type prop = {
-  chatItem: Chat;
+  chatItem: Chats;
+  chats: Chats[];
 };
-const ChatListItem = ({ chatItem }: prop) => {
+const ChatListItem = ({ chatItem, chats }: prop) => {
+  const { changeChat } = useChatStore();
+  const { currentUser } = useUserStore();
+  const handlerClick = async () => {
+    if (chatItem.chatId) {
+      //here
+      const userChats = chats.map((item) => {
+        const { user, ...rest } = item;
+        return rest;
+      });
+      const chatIndex = userChats.findIndex(
+        (c) => c.chatId === chatItem.chatId
+      );
+      userChats[chatIndex].isSeen = true;
+      const userChatRef = doc(db, "userchats", currentUser?.id);
+      try {
+        await updateDoc(userChatRef, {
+          chats: userChats,
+        });
+        changeChat(chatItem.chatId, chatItem.user);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   return (
     <>
-      <ListItem sx={{ padding: "10px 0px" }}>
+      <ListItem
+        sx={{
+          padding: "10px 0px",
+          cursor: "pointer",
+          backgroundColor: `${chatItem.isSeen ? "trasparent" : "#5183fe"}`,
+        }}
+        onClick={handlerClick}
+      >
         <ListItemAvatar>
           <Avatar
             alt="Remy Sharp"
@@ -25,6 +60,11 @@ const ChatListItem = ({ chatItem }: prop) => {
           primary={
             <Typography sx={{ fontSize: "12px", fontWeight: "200px" }}>
               {chatItem.user.username}
+            </Typography>
+          }
+          secondary={
+            <Typography sx={{ fontSize: "12px", fontWeight: "200px" }}>
+              {chatItem.lastMessage}
             </Typography>
           }
         />

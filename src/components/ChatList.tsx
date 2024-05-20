@@ -13,6 +13,7 @@ import AddUserAlert from "./AddUserAlert";
 import { User, useUserStore } from "../libs/userStore";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../libs/firebase";
+import { Chats, ChatDoc } from "../libs/chatStore";
 
 const StyledContainer = styled(Box)({
   display: "flex",
@@ -59,20 +60,9 @@ const StyledBox = styled(Box)({
   cursor: "pointer",
 });
 
-type ChatDoc = {
-  receiverId: string;
-  updatedAt: number;
-};
-
-export type Chat = ChatDoc & {
-  chatId?: string;
-  lastMessage?: string;
-  user: User;
-};
-
 const ChatList = () => {
   const [addMode, setMode] = useState<boolean>(false);
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chats, setChats] = useState<Chats[]>([]);
   const { currentUser } = useUserStore();
   /* 
 
@@ -147,8 +137,12 @@ const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
       </Stack>
       {chats.length > 0 && (
         <List sx={{ height: "100%" }}>
-          {chats.map((e: Chat) => (
-            <ChatListItem key={crypto.randomUUID()} chatItem={e} />
+          {chats.map((e: Chats) => (
+            <ChatListItem
+              key={crypto.randomUUID()}
+              chatItem={e}
+              chats={chats}
+            />
           ))}
         </List>
       )}

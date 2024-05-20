@@ -1,6 +1,5 @@
-import { Box, Stack, Typography, styled } from "@mui/material";
+import { Stack, Typography, styled } from "@mui/material";
 import "./App.css";
-import Chat from "./components/Chat";
 import Detail from "./components/Detail";
 import List from "./components/List";
 import Login from "./components/Login";
@@ -9,6 +8,8 @@ import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./libs/firebase";
 import { useUserStore } from "./libs/userStore";
+import { useChatStore } from "./libs/chatStore";
+import Chat from "./components/Chat";
 
 const Container = styled(Stack)({
   display: "flex",
@@ -25,10 +26,11 @@ const Container = styled(Stack)({
 
 function App() {
   const { currentUser, isLoading, fethcUserInfo } = useUserStore();
+  const { chatId } = useChatStore();
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      fethcUserInfo(user?.uid);
+      fethcUserInfo(user?.uid ?? "");
     });
     return () => {
       unSub();
@@ -57,8 +59,13 @@ function App() {
       {currentUser ? (
         <>
           <List />
-          <Chat />
-          <Detail />
+
+          {chatId && (
+            <>
+              <Chat />
+              <Detail />
+            </>
+          )}
         </>
       ) : (
         <Login />
