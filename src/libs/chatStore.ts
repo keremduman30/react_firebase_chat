@@ -7,7 +7,7 @@ export type Message = {
     senderId: string;
     text: string;
     img?: string;
-    createdAt?: string|Date;
+    createdAt?: string | Date;
   }[];
 };
 
@@ -36,6 +36,7 @@ type ChatStore = {
   isCurrentUserBlocked: boolean;
   isReceiverBlocked: boolean;
   changeChat: (chatId: string, user: User) => void;
+  changeBlocked: () => void;
 };
 export const useChatStore = create<ChatStore>((set) => ({
   chatId: "",

@@ -42,7 +42,7 @@ const StyledTextField = styled(TextField)({
     backgroundColor: "rgba(17, 25, 40, 0.5)",
     borderRadius: "10px",
     fontSize: "16px",
-    color: "white",
+    color: "white !important",
   },
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
@@ -97,7 +97,8 @@ const Chat = () => {
   });
 
   const endRef = useRef<null | HTMLDivElement>(null);
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isReceiverBlocked, isCurrentUserBlocked } =
+    useChatStore();
   const { currentUser } = useUserStore();
 
   useEffect(() => {
@@ -220,7 +221,7 @@ const Chat = () => {
             {user?.username}
           </Typography>
         }
-        subheader="September 14, 2016"
+        subheader={format(chats?.createdAt as TDate)}
       />
       <Divider variant="fullWidth" sx={{ bgcolor: "grey" }} />
       <CenterStack>
@@ -338,7 +339,13 @@ const Chat = () => {
         <StyledTextField
           fullWidth
           value={textMsg}
-          placeholder="type a message"
+          placeholder={
+            isReceiverBlocked || isCurrentUserBlocked
+              ? "blocked user"
+              : "type a message"
+          }
+          sx={{ color: "white !important" }}
+          disabled={isReceiverBlocked || isCurrentUserBlocked}
           onChange={(e) => setTextMsg(e.target.value)}
         />
 
@@ -360,6 +367,7 @@ const Chat = () => {
             border: "none",
             ":hover": { backgroundColor: "#2c5ace", border: "none" },
           }}
+          disabled={isReceiverBlocked || isCurrentUserBlocked}
           onClick={handleSend}
         >
           Send

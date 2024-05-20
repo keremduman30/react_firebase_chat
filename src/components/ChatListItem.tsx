@@ -19,9 +19,10 @@ const ChatListItem = ({ chatItem, chats }: prop) => {
   const { changeChat } = useChatStore();
   const { currentUser } = useUserStore();
   const handlerClick = async () => {
-    if (chatItem.chatId) {
+    if (chatItem.chatId && currentUser) {
       //here
       const userChats = chats.map((item) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { user, ...rest } = item;
         return rest;
       });
