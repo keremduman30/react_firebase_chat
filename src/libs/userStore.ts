@@ -11,6 +11,7 @@ export type User = {
 type UserStore = {
   currentUser: User | null;
   isLoading: boolean;
+  fethcUserInfo: (uid: string) => void;
 };
 export const useUserStore = create<UserStore>((set) => ({
   currentUser: null,

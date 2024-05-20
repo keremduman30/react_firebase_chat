@@ -4,7 +4,7 @@ type prop = {
   child: ReactNode;
 };
 const DetailAccordionItem = ({ child }: prop) => {
-  return (
+  return ( 
     <AccordionDetails sx={{ padding:"0" }}>{child}</AccordionDetails>
   );
 };

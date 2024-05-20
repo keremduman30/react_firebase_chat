@@ -78,7 +78,7 @@ const StyledLoginButton = styled(Button)({
   },
 });
 
-type AvatarObjectURl = {
+export type AvatarObjectURl = {
   file: File | null;
   url: string;
 };
