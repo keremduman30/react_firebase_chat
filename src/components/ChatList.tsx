@@ -64,6 +64,7 @@ const ChatList = () => {
   const [addMode, setMode] = useState<boolean>(false);
   const [chats, setChats] = useState<Chats[]>([]);
   const { currentUser } = useUserStore();
+  const [search, setSearch] = useState("");
   /* 
 
 const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
@@ -103,6 +104,10 @@ const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
     }
   }, [currentUser]);
 
+  const filterChats = chats.filter((c) =>
+    c.user.username.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <StyledContainer>
       <Stack
@@ -124,6 +129,7 @@ const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
               </InputAdornment>
             ),
           }}
+          onChange={(e) => setSearch(e.target.value)}
           variant="outlined"
           placeholder="Search"
         />
@@ -135,9 +141,9 @@ const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
           />
         </StyledBox>
       </Stack>
-      {chats.length > 0 && (
+      {filterChats.length > 0 && (
         <List sx={{ height: "100%" }}>
-          {chats.map((e: Chats) => (
+          {filterChats.map((e: Chats) => (
             <ChatListItem
               key={crypto.randomUUID()}
               chatItem={e}

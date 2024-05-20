@@ -14,7 +14,9 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { auth } from "../libs/firebase";
+import { auth, db } from "../libs/firebase";
+import { useChatStore } from "../libs/chatStore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 
 const StyledBox = styled(Box)({
   flex: "1",
@@ -36,8 +38,23 @@ const StyledBox = styled(Box)({
 });
 
 const Detail = () => {
+  const { isCurrentUserBlocked, user, isReceiverBlocked, changeBlocked } =
+    useChatStore();
   const handlerLogout = async () => {
     await auth.signOut();
+  };
+
+  const handleBlock = async () => {
+    if (!user) return;
+    const userDocRef = doc(db, "users", user.id);
+    try {
+      await updateDoc(userDocRef, {
+        blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
+      });
+      changeBlocked();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -54,7 +71,7 @@ const Detail = () => {
           }}
           avatar={
             <Avatar
-              src="/avatar.png"
+              src={user?.avatar || "/avatar.png"}
               sx={{
                 bgcolor: red[500],
                 width: "80px",
@@ -66,7 +83,7 @@ const Detail = () => {
           }
           title={
             <Typography variant="h5" textAlign={"center"} mb={1}>
-              John Doe
+              {user?.username}
             </Typography>
           }
           subheader={
@@ -77,7 +94,7 @@ const Detail = () => {
         />
         <Divider variant="fullWidth" sx={{ bgcolor: "grey", mb: "10px" }} />
         <Stack sx={{ gap: "0px" }}>
-          {Array.from({ length: 3 }, () => (
+          {Array.from({ length: 3 }, (_, b) => (
             <Accordion
               key={crypto.randomUUID()}
               sx={{
@@ -103,7 +120,7 @@ const Detail = () => {
                 aria-controls="panel1-content"
                 id="panel1-header"
               >
-                Accordion 1
+                Accordion {`${b + 1}`}
               </AccordionSummary>
               {/* <DetailAccordionItem child={<span>{i}</span>} /> */}
             </Accordion>
@@ -135,7 +152,7 @@ const Detail = () => {
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            Accordion 1
+            Accordion 4
           </AccordionSummary>
           <AccordionDetails sx={{ padding: "0 10px" }}>
             {Array.from({ length: 2 }, () => (
@@ -147,7 +164,6 @@ const Detail = () => {
                 }}
                 avatar={
                   <Avatar
-                    src="/avatar.png"
                     sx={{
                       bgcolor: red[500],
                       width: "40px",
@@ -156,7 +172,9 @@ const Detail = () => {
                       borderRadius: "5px",
                     }}
                     aria-label="recipe"
-                  />
+                  >
+                    {user?.username[0].toUpperCase()}
+                  </Avatar>
                 }
                 action={
                   <IconButton>
@@ -174,7 +192,7 @@ const Detail = () => {
                 }
                 title={
                   <Typography variant="h6" fontSize={14}>
-                    John Doe
+                    {user?.username}
                   </Typography>
                 }
               />
@@ -220,8 +238,13 @@ const Detail = () => {
               bgcolor: "rgba(230,74,105,0.553)",
               "&:hover": { bgcolor: "rgba(220,20,60,0.7)", boxShadow: "0" },
             }}
+            onClick={handleBlock}
           >
-            Block User
+            {isCurrentUserBlocked
+              ? "You are blocked"
+              : isReceiverBlocked
+              ? "user blocked"
+              : "block user"}
           </Button>
           <Button
             variant="contained"
