@@ -17,31 +17,34 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { auth, db } from "../libs/firebase";
 import { useChatStore } from "../libs/chatStore";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { useUserStore } from "../libs/userStore";
 
 const StyledBox = styled(Box)({
   flex: "1",
   overflowY: "scroll",
   "&::-webkit-scrollbar": {
-    //baslangıc scroll ayarları
     width: "10px",
     backgroundColor: "transparent",
   },
-  /*  " &::-webkit-scrollbar-track": {
-    //arka renk
-    backgroundColor: "transparent",
-  }, */
-  " &::-webkit-scrollbar-thumb": {
-    //arkasındaki color
 
+  " &::-webkit-scrollbar-thumb": {
     backgroundColor: "grey",
   },
 });
 
 const Detail = () => {
-  const { isCurrentUserBlocked, user, isReceiverBlocked, changeBlocked } =
-    useChatStore();
+  const {
+    isCurrentUserBlocked,
+    user,
+    isReceiverBlocked,
+    changeBlocked,
+    chatLogOut,
+  } = useChatStore();
+  const { fethcLogOut } = useUserStore();
   const handlerLogout = async () => {
     await auth.signOut();
+    fethcLogOut();
+    chatLogOut();
   };
 
   const handleBlock = async () => {
@@ -131,7 +134,6 @@ const Detail = () => {
           sx={{
             backgroundColor: "transparent",
             color: "white",
-            // padding: "0px",
             boxShadow: "0",
           }}
           disableGutters
@@ -203,7 +205,6 @@ const Detail = () => {
           sx={{
             backgroundColor: "transparent",
             color: "white",
-            // padding: "0px",
             boxShadow: "0",
           }}
           disableGutters

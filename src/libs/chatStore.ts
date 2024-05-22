@@ -37,6 +37,7 @@ type ChatStore = {
   isReceiverBlocked: boolean;
   changeChat: (chatId: string, user: User) => void;
   changeBlocked: () => void;
+  chatLogOut: () => void;
 };
 export const useChatStore = create<ChatStore>((set) => ({
   chatId: "",
@@ -76,5 +77,8 @@ export const useChatStore = create<ChatStore>((set) => ({
     set((state) => {
       return { ...state, isReceiverBlocked: !state.isReceiverBlocked };
     });
+  },
+  chatLogOut: () => {
+    set({ chatId: "", user: null });
   },
 }));

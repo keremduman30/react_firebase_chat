@@ -19,6 +19,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import upload from "../libs/upload";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const StyledContainer = styled(Box)({
   width: "100%",
@@ -34,7 +35,6 @@ const VisuallyHiddenInput = styled("input")({
 
 const StyledItem = styled(Stack)({
   flex: "1",
-
   display: "flex",
   flexDirection: "column",
   gap: "20px",
@@ -43,15 +43,12 @@ const StyledItem = styled(Stack)({
 const StyledForm = styled("form")({
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
+  alignItems: "start",
   justifyContent: "center",
-  gap: "20px",
 });
 const StyledTextField = styled(TextField)({
   "& .MuiInputBase-root": {
-    // height: "30px",
     borderRadius: "10px",
-    // padding: "20px",
     fontSize: "12px",
     backgroundColor: "rgba(17, 25, 40, 0.5)",
     outline: "none",
@@ -77,10 +74,25 @@ const StyledLoginButton = styled(Button)({
     boxShadow: "none",
   },
 });
+const StyledErrorText = styled(Typography)({
+  margin: 0,
+  padding: "0px 0",
+  color: "#C70039",
+  fontWeight: "bold",
+});
 
 export type AvatarObjectURl = {
   file: File | null;
   url: string;
+};
+type LoginFormField = {
+  email: string;
+  password: string;
+};
+type RegisterFormField = {
+  username: string;
+  email: string;
+  password: string;
 };
 
 const Login = () => {
@@ -89,7 +101,16 @@ const Login = () => {
     url: "",
   });
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormField>();
+  const {
+    register: registerForm,
+    handleSubmit: handlerRegisterSubmit,
+    formState: { errors: registerError, isSubmitting: registerIsSubmitting },
+  } = useForm<RegisterFormField>();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -99,18 +120,11 @@ const Login = () => {
       });
     }
   };
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData(e.currentTarget);
-    const { username, email, password } = Object.fromEntries(formData);
+  const onSubmitRegister: SubmitHandler<RegisterFormField> = async (data) => {
+    const { username, email, password } = data;
 
     try {
-      const res = await createUserWithEmailAndPassword(
-        auth,
-        email as string,
-        password as string
-      );
+      const res = await createUserWithEmailAndPassword(auth, email, password);
 
       const imgUrl = await upload(avatar.file);
 
@@ -129,28 +143,15 @@ const Login = () => {
       if (error instanceof Error) {
         toast.error(error.message);
       }
-    } finally {
-      setLoading(false);
     }
   };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmitLogin: SubmitHandler<LoginFormField> = async (data) => {
     try {
-      const formData = new FormData(e.currentTarget);
-      const { email, password } = Object.fromEntries(formData);
-      await signInWithEmailAndPassword(
-        auth,
-        email as string,
-        password as string
-      );
+      await signInWithEmailAndPassword(auth, data.email, data.password);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,26 +159,54 @@ const Login = () => {
     <StyledContainer>
       <StyledItem>
         <Typography variant="h5">Welcome Back !</Typography>
-        <StyledForm onSubmit={handleSubmit}>
+        <StyledForm
+          onSubmit={handleSubmit(onSubmitLogin)}
+          sx={{ gap: `${errors.email || errors.password ? "10px" : "20px"}` }}
+        >
           <StyledTextField
+            {...register("email", {
+              required: "Email is required",
+              validate: (value) => {
+                if (!value.includes("@")) {
+                  return "Email must include @";
+                }
+                return true;
+              },
+            })}
             variant="outlined"
             placeholder="email"
             name="email"
           />
+          {errors.email && (
+            <StyledErrorText>{errors.email.message}</StyledErrorText>
+          )}
           <StyledTextField
+            {...register("password", { required: "password is required" })}
             variant="outlined"
             placeholder="password"
+            type="password"
             name="password"
           />
-          <StyledLoginButton type="submit" disabled={loading}>
-            {loading ? "loading..." : "Sign In"}
+          {errors.password && (
+            <StyledErrorText>password required</StyledErrorText>
+          )}
+
+          <StyledLoginButton type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "loading..." : "Sign In"}
           </StyledLoginButton>
         </StyledForm>
       </StyledItem>
       <Divider orientation="vertical" sx={{ bgcolor: "grey", height: "80%" }} />
       <StyledItem>
         <Typography variant="h5">Create An Account</Typography>
-        <StyledForm onSubmit={handleRegister}>
+        <StyledForm
+          onSubmit={handlerRegisterSubmit(onSubmitRegister)}
+          sx={{
+            gap: `${
+              registerError.email || registerError.password ? "10px" : "20px"
+            }`,
+          }}
+        >
           <CardHeader
             sx={{ padding: "0px", margin: "0px" }}
             avatar={
@@ -212,27 +241,50 @@ const Login = () => {
             }
           />
           <StyledTextField
+            {...registerForm("username", {
+              required: "username is required",
+              minLength: { value: 3, message: "at least 3 characters" },
+            })}
             variant="outlined"
             placeholder="user name"
             name="username"
           />
+          {registerError.username && (
+            <StyledErrorText>{registerError.username.message}</StyledErrorText>
+          )}
           <StyledTextField
+            {...registerForm("email", {
+              required: "Email is required",
+              validate: (value) => {
+                if (!value.includes("@")) {
+                  return "Email must include @";
+                }
+                return true;
+              },
+            })}
             variant="outlined"
             placeholder="email"
             name="email"
           />
+          {registerError.email && (
+            <StyledErrorText>{registerError.email.message}</StyledErrorText>
+          )}
           <StyledTextField
+            {...registerForm("password", { required: "password is required" })}
             variant="outlined"
             placeholder="password"
             type="password"
             name="password"
           />
+          {registerError.password && (
+            <StyledErrorText>password required</StyledErrorText>
+          )}
           <StyledLoginButton
             variant="contained"
             type="submit"
-            disabled={loading}
+            disabled={registerIsSubmitting}
           >
-            {loading ? "loading..." : "Sign Up"}
+            {registerIsSubmitting ? "loading..." : "Sign Up"}
           </StyledLoginButton>
         </StyledForm>
       </StyledItem>

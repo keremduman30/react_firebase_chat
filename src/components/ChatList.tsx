@@ -65,21 +65,13 @@ const ChatList = () => {
   const [chats, setChats] = useState<Chats[]>([]);
   const { currentUser } = useUserStore();
   const [search, setSearch] = useState("");
-  /* 
 
-const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
-    console.log("Current data: ", doc.data());
-});
-
-*/
   useEffect(() => {
     if (currentUser) {
       const unSub = onSnapshot(
         doc(db, "userchats", currentUser?.id),
         async (res) => {
-          const items = res.data(); //burada tum userchatsi alacaz ama orada receivedId var direk user bilgils yok
-          //user bilgisi oraya kaydetmedik cunku kullanıcı profil ve isim degistirirse direk yansımıyacak o yuzden biz id ile
-          //bu userları hepsini alıp setChatse ekliyecez
+          const items = res.data();
 
           if (items) {
             const chats = items.chats as ChatDoc[];

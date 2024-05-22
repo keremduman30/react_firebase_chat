@@ -30,14 +30,12 @@ function App() {
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      fethcUserInfo(user?.uid ?? "");
+      fethcUserInfo(user?.uid);
     });
     return () => {
       unSub();
     };
   }, [fethcUserInfo]);
-
-  console.log(currentUser);
 
   if (isLoading)
     return (

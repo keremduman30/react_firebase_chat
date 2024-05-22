@@ -11,17 +11,17 @@ export type User = {
 type UserStore = {
   currentUser: User | null;
   isLoading: boolean;
-  fethcUserInfo: (uid: string) => void;
+  fethcUserInfo: (uid: string | undefined) => void;
+  fethcLogOut: () => void;
 };
 export const useUserStore = create<UserStore>((set) => ({
   currentUser: null,
   isLoading: true,
-  fethcUserInfo: async (uid: string) => {
+  fethcUserInfo: async (uid: string | undefined) => {
     if (!uid) return set({ currentUser: null, isLoading: false });
     try {
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
-      console.log("istek atıldı");
 
       if (docSnap.exists()) {
         const userData: User = docSnap.data() as User;
@@ -32,5 +32,8 @@ export const useUserStore = create<UserStore>((set) => ({
     } catch (error) {
       return set({ currentUser: null, isLoading: false });
     }
+  },
+  fethcLogOut: () => {
+    set({ isLoading: false, currentUser: null });
   },
 }));
