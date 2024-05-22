@@ -62,16 +62,11 @@ const CenterStack = styled(Stack)({
   flexDirection: "column",
   overflowY: "scroll",
   "&::-webkit-scrollbar": {
-    //baslangıc scroll ayarları
     width: "10px",
     backgroundColor: "rgba(17, 25, 40, 0.5)",
   },
-  /*  " &::-webkit-scrollbar-track": {
-    //arka renk
-    backgroundColor: "transparent",
-  }, */
+
   " &::-webkit-scrollbar-thumb": {
-    //arkasındaki color
 
     backgroundColor: "grey",
   },
@@ -146,7 +141,6 @@ const Chat = () => {
       const userIDs = [currentUser?.id, user?.id];
 
       userIDs.forEach(async (id) => {
-        //simdi son atılan mesajı guncelliyelim
         if (id) {
           const userChatsRef = doc(db, "userchats", id);
           const userChatsSnapshot = await getDoc(userChatsRef);
@@ -266,7 +260,9 @@ const Chat = () => {
                     </StyledMsgTypography>
                   }
                   subheader={
-                    <Typography sx={{ fontSize: "13px", mt: "5px" }}>
+                    <Typography
+                      sx={{ fontSize: "13px", mt: "5px", padding: "0 15px" }}
+                    >
                       {format(message.createdAt as TDate)}
                     </Typography>
                   }

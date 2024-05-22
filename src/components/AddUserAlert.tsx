@@ -64,14 +64,11 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
     try {
       const chatRef = collection(db, "chats");
       const userRef = collection(db, "userchats");
-      //burada chat collectionu yarataz ve bunun idside lzım tum mesajları almak için
       const newChatRef = doc(chatRef);
-      // const userChatsRef = doc(db, "userchats");
       await setDoc(newChatRef, {
         createdAt: serverTimestamp(),
         messages: [],
       });
-      //simdi eklenen userin idsini userchats ta ekliyelim ikisi için
       await updateDoc(doc(userRef, currentUser?.id), {
         chats: arrayUnion({
           chatId: newChatRef.id,
@@ -89,6 +86,8 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
           updateAt: Date.now(),
         }),
       });
+      setMode(false);
+      setSearchUsers(null);
     } catch (error) {
       console.log(error);
     }
@@ -155,7 +154,6 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
                 avatar={
                   <Avatar
                     src={searchUsers.avatar || "/avatar.png"}
-                    // sx={{ bgcolor: red[500] }}
                     aria-label="recipe"
                   ></Avatar>
                 }
