@@ -21,32 +21,59 @@ import { doc, setDoc } from "firebase/firestore";
 import upload from "../libs/upload";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const StyledContainer = styled(Box)({
+const StyledContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   height: "100%",
   display: "flex",
   alignItems: "center",
   gap: "100px",
-});
+
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+  },
+  [theme.breakpoints.up("md")]: {
+    gap: "0px",
+  },
+  [theme.breakpoints.up("lg")]: {
+    gap: "50px",
+  },
+}));
 
 const VisuallyHiddenInput = styled("input")({
   display: "none",
 });
 
-const StyledItem = styled(Stack)({
+const StyledItem = styled(Stack)(({ theme }) => ({
   flex: "1",
   display: "flex",
   flexDirection: "column",
   gap: "20px",
   alignItems: "center",
-});
-const StyledForm = styled("form")({
+  [theme.breakpoints.down("sm")]: {
+    justifyContent: "center",
+  },
+}));
+const StyledForm = styled("form")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "start",
   justifyContent: "center",
-});
-const StyledTextField = styled(TextField)({
+
+  [theme.breakpoints.up("xs")]: {
+    width: "100%",
+  },
+  [theme.breakpoints.up("sm")]: {
+    width: "30%",
+  },
+  [theme.breakpoints.up("md")]: {
+    width: "fit-content",
+  },
+}));
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  [theme.breakpoints.up("sm")]: {
+    width: "100%",
+  },
+  // width: "100%",
   "& .MuiInputBase-root": {
     borderRadius: "10px",
     fontSize: "12px",
@@ -59,7 +86,7 @@ const StyledTextField = styled(TextField)({
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
   },
-});
+}));
 
 const StyledLoginButton = styled(Button)({
   width: "100%",
@@ -100,7 +127,7 @@ const Login = () => {
     file: null,
     url: "",
   });
-
+  const [registerMobile, setRegisterMobile] = useState(false);
   const {
     register,
     handleSubmit,
@@ -157,7 +184,11 @@ const Login = () => {
 
   return (
     <StyledContainer>
-      <StyledItem>
+      <StyledItem
+        sx={{
+          display: { xs: `${registerMobile ? "none" : "flex"}`, md: "flex" },
+        }}
+      >
         <Typography variant="h5">Welcome Back !</Typography>
         <StyledForm
           onSubmit={handleSubmit(onSubmitLogin)}
@@ -194,10 +225,35 @@ const Login = () => {
           <StyledLoginButton type="submit" disabled={isSubmitting}>
             {isSubmitting ? "loading..." : "Sign In"}
           </StyledLoginButton>
+          <Typography
+            sx={{
+              display: { xs: "flex", md: "none" },
+              color: "white",
+              justifyContent: "flex-end",
+              textDecoration: "underline",
+              width: "100%",
+              padding: " 0 10px",
+            }}
+            onClick={() => setRegisterMobile((prev) => !prev)}
+          >
+            {registerMobile ? "Sign In" : "Sign Up"}
+          </Typography>
         </StyledForm>
       </StyledItem>
-      <Divider orientation="vertical" sx={{ bgcolor: "grey", height: "80%" }} />
-      <StyledItem>
+      <Divider
+        orientation="vertical"
+        sx={{
+          display: { xs: "none", md: "flex" },
+          bgcolor: "grey",
+          height: "80%",
+        }}
+      />
+
+      <StyledItem
+        sx={{
+          display: { xs: `${!registerMobile ? "none" : "flex"}`, md: "flex" },
+        }}
+      >
         <Typography variant="h5">Create An Account</Typography>
         <StyledForm
           onSubmit={handlerRegisterSubmit(onSubmitRegister)}
@@ -286,6 +342,19 @@ const Login = () => {
           >
             {registerIsSubmitting ? "loading..." : "Sign Up"}
           </StyledLoginButton>
+          <Typography
+            sx={{
+              display: { xs: "flex", md: "none" },
+              color: "white",
+              justifyContent: "flex-end",
+              textDecoration: "underline",
+              width: "100%",
+              padding: " 0 10px",
+            }}
+            onClick={() => setRegisterMobile((prev) => !prev)}
+          >
+            {registerMobile ? "Sign In" : "Sign Up"}
+          </Typography>
         </StyledForm>
       </StyledItem>
     </StyledContainer>

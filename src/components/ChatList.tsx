@@ -125,7 +125,11 @@ const ChatList = () => {
           variant="outlined"
           placeholder="Search"
         />
-        <StyledBox onClick={() => setMode(!addMode)}>
+        <StyledBox
+          onClick={() => {
+            setMode(!addMode);
+          }}
+        >
           <img
             src={addMode ? "/minus.png" : "/plus.png"}
             alt=""

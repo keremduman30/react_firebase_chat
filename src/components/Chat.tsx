@@ -26,6 +26,7 @@ import { useUserStore } from "../libs/userStore";
 import { AvatarObjectURl } from "./Login";
 import upload from "../libs/upload";
 import { TDate, format } from "timeago.js";
+import { ArrowBack } from "@mui/icons-material";
 
 const Container = styled(Box)({
   flex: "2",
@@ -63,13 +64,16 @@ const CenterStack = styled(Stack)({
   overflowY: "scroll",
   "&::-webkit-scrollbar": {
     width: "10px",
-    backgroundColor: "rgba(17, 25, 40, 0.5)",
+    backgroundColor: "transparent",
+  },
+  " &::-webkit-scrollbar-track": {
+    backgroundColor: "transparent",
   },
 
   " &::-webkit-scrollbar-thumb": {
-
     backgroundColor: "grey",
   },
+
   gap: "20px",
 });
 
@@ -90,6 +94,7 @@ const Chat = () => {
     file: null,
     url: "",
   });
+  const { chatLogOut } = useChatStore();
 
   const endRef = useRef<null | HTMLDivElement>(null);
   const { chatId, user, isReceiverBlocked, isCurrentUserBlocked } =
@@ -176,19 +181,27 @@ const Chat = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{ display: `${chatId ? "flex" : "none"}` }}>
       <CardHeader
         avatar={
-          <Avatar
-            src={user?.avatar || "/avatar.png"}
-            sx={{
-              bgcolor: red[500],
-              width: "50px",
-              height: "50px",
-              objectFit: "cover",
-            }}
-            aria-label="recipe"
-          />
+          <Stack direction={"row"} gap={1} alignItems={"center"}>
+            <IconButton
+              onClick={chatLogOut}
+              sx={{ display: { xs: "block", lg: "none" } }}
+            >
+              <ArrowBack sx={{ width: 20, height: 30, color: "white" }} />
+            </IconButton>
+            <Avatar
+              src={user?.avatar || "/avatar.png"}
+              sx={{
+                bgcolor: red[500],
+                width: "50px",
+                height: "50px",
+                objectFit: "cover",
+              }}
+              aria-label="recipe"
+            />
+          </Stack>
         }
         action={
           <Stack
@@ -199,12 +212,17 @@ const Chat = () => {
               padding: "10px",
             }}
           >
-            <IconButton aria-label="settings">
-              <img src="/phone.png" width={20} height={20} />
-            </IconButton>
-            <IconButton aria-label="settings">
-              <img src="/video.png" width={20} height={20} />
-            </IconButton>
+            <Stack
+              direction={"row"}
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
+              <IconButton aria-label="settings">
+                <img src="/phone.png" width={20} height={20} />
+              </IconButton>
+              <IconButton aria-label="settings">
+                <img src="/video.png" width={20} height={20} />
+              </IconButton>
+            </Stack>
             <IconButton aria-label="settings">
               <img src="/info.png" width={20} height={20} />
             </IconButton>
@@ -324,7 +342,10 @@ const Chat = () => {
           marginTop: "auto",
         }}
       >
-        <Stack direction={"row"} sx={{ gap: "20px" }}>
+        <Stack
+          direction={"row"}
+          sx={{ gap: "20px", display: { xs: chatId && "none" } }}
+        >
           <Typography htmlFor="file" component={"label"}>
             <StyledImg src="/img.png" alt="" />
           </Typography>
@@ -345,13 +366,19 @@ const Chat = () => {
           onChange={(e) => setTextMsg(e.target.value)}
         />
 
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "relative", display: { xs: chatId && "none" } }}>
           <StyledImg
             src="/emoji.png"
             alt=""
             onClick={() => setOpenEmoji(!openEmoji)}
           />
-          <Box sx={{ position: "absolute", bottom: "50px", left: "0" }}>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "50px",
+              left: "0",
+            }}
+          >
             <EmojiPicker open={openEmoji} onEmojiClick={handlerEmoji} />
           </Box>
         </Box>
