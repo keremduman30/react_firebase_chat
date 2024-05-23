@@ -1,30 +1,54 @@
-# React + TypeScript + Vite
+# Chat Uygulaması
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu proje, kullanıcıların oturum açabildiği, arkadaş ekleyebildiği, sohbet edebildiği ve kullanıcıları engelleyebildiği bir chat uygulamasıdır.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Özellikler
 
-## Expanding the ESLint configuration
+- **Kullanıcı Kaydı ve Girişi**: Firebase Authentication kullanılarak kullanıcı kaydı ve girişi.
+- **Arkadaş Ekleme**: Kullanıcılar diğer kullanıcıları arkadaş olarak ekleyebilir.
+- **Sohbet**: Arkadaşlar arasında gerçek zamanlı mesajlaşma.
+- **Kullanıcı Engelleme**: Belirli kullanıcıları engelleme ve bu kullanıcıların mesajlarını görmeme.
+- **Güzel Arayüz**: Material-UI (MUI) kullanılarak modern ve kullanıcı dostu arayüz.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-- Configure the top-level `parserOptions` property like this:
+## Kullanılan Teknolojiler
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+- **React**: Kullanıcı arayüzünü oluşturmak için.
+- **Material-UI (MUI)**: Kullanıcı arayüzü bileşenleri ve stiller için.
+- **Zustand**: Durum yönetimi için.
+- **React-Hook-Form**: Form yönetimi ve doğrulama için.
+- **Firebase**: Kimlik doğrulama ve gerçek zamanlı veritabanı için.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Kurulum ve Çalıştırma
+
+Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
+
+1. **Depoyu Klonlayın**
+   
+   ```bash
+   git clone https://github.com/kullaniciadi/chat-uygulamasi.git
+   cd chat-uygulamasi
+3. **Gerekli Bağımlılıkları Yükleyin**
+
+   ```bash
+   npm install
+4. **Firebase projenizi oluşturun ve firebaseConfig.js dosyasına yapılandırma bilgilerinizi ekleyin**
+   
+      ```bash
+      // firebaseConfig.js
+      const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+     };
+    export default firebaseConfig;
+
+6. **Projeyi Çalıştırın**
+   
+   ```bash
+   npm run dev
+
