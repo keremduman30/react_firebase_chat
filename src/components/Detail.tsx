@@ -39,6 +39,7 @@ const Detail = () => {
     isReceiverBlocked,
     changeBlocked,
     chatLogOut,
+    chatId,
   } = useChatStore();
   const { fethcLogOut } = useUserStore();
   const handlerLogout = async () => {
@@ -61,7 +62,9 @@ const Detail = () => {
   };
 
   return (
-    <StyledBox>
+    <StyledBox
+      sx={{ display: { xs: `${chatId ? "none" : "block"}`, md: "block" } }}
+    >
       <Stack>
         <CardHeader
           sx={{
@@ -96,7 +99,7 @@ const Detail = () => {
           }
         />
         <Divider variant="fullWidth" sx={{ bgcolor: "grey", mb: "10px" }} />
-        <Stack sx={{ gap: "0px" }}>
+        <Stack sx={{ gap: "0px", padding: "0 10px" }}>
           {Array.from({ length: 3 }, (_, b) => (
             <Accordion
               key={crypto.randomUUID()}
@@ -128,137 +131,135 @@ const Detail = () => {
               {/* <DetailAccordionItem child={<span>{i}</span>} /> */}
             </Accordion>
           ))}
-        </Stack>
-
-        <Accordion
-          sx={{
-            backgroundColor: "transparent",
-            color: "white",
-            boxShadow: "0",
-          }}
-          disableGutters
-        >
-          <AccordionSummary
-            expandIcon={
-              <ExpandMoreIcon
-                sx={{
-                  width: "30px",
-                  height: "30px",
-                  backgroundColor: "rgba(17, 25, 40, 0.5)",
-                  borderRadius: "50%",
-                  color: "white",
-                  padding: "5px",
-                }}
-              />
-            }
-            aria-controls="panel1-content"
-            id="panel1-header"
+          <Accordion
+            sx={{
+              backgroundColor: "transparent",
+              color: "white",
+              boxShadow: "0",
+            }}
+            disableGutters
           >
-            Accordion 4
-          </AccordionSummary>
-          <AccordionDetails sx={{ padding: "0 10px" }}>
-            {Array.from({ length: 2 }, () => (
-              <CardHeader
-                key={crypto.randomUUID()}
-                sx={{
-                  width: "100%",
-                  padding: "10px 5px",
-                }}
-                avatar={
-                  <Avatar
-                    sx={{
-                      bgcolor: red[500],
-                      width: "40px",
-                      height: "40px",
-                      objectFit: "cover",
-                      borderRadius: "5px",
-                    }}
-                    aria-label="recipe"
-                  >
-                    {user?.username[0].toUpperCase()}
-                  </Avatar>
-                }
-                action={
-                  <IconButton>
-                    <ExpandMoreIcon
+            <AccordionSummary
+              expandIcon={
+                <ExpandMoreIcon
+                  sx={{
+                    width: "30px",
+                    height: "30px",
+                    backgroundColor: "rgba(17, 25, 40, 0.5)",
+                    borderRadius: "50%",
+                    color: "white",
+                    padding: "5px",
+                  }}
+                />
+              }
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Accordion 4
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: "0 10px" }}>
+              {Array.from({ length: 2 }, () => (
+                <CardHeader
+                  key={crypto.randomUUID()}
+                  sx={{
+                    width: "100%",
+                    padding: "10px 5px",
+                  }}
+                  avatar={
+                    <Avatar
                       sx={{
-                        width: "30px",
-                        height: "30px",
-                        backgroundColor: "rgba(17, 25, 40, 0.5)",
-                        borderRadius: "50%",
-                        color: "white",
-                        padding: "5px",
+                        bgcolor: red[500],
+                        width: "40px",
+                        height: "40px",
+                        objectFit: "cover",
+                        borderRadius: "5px",
                       }}
-                    />
-                  </IconButton>
-                }
-                title={
-                  <Typography variant="h6" fontSize={14}>
-                    {user?.username}
-                  </Typography>
-                }
-              />
-            ))}
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          sx={{
-            backgroundColor: "transparent",
-            color: "white",
-            boxShadow: "0",
-          }}
-          disableGutters
-        >
-          <AccordionSummary
-            expandIcon={
-              <ExpandMoreIcon
-                sx={{
-                  width: "30px",
-                  height: "30px",
-                  backgroundColor: "rgba(17, 25, 40, 0.5)",
-                  borderRadius: "50%",
-                  color: "white",
-                  padding: "5px",
-                }}
-              />
-            }
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            Shared files
-          </AccordionSummary>
-          {/* <DetailAccordionItem child={<span>{i}</span>} /> */}
-        </Accordion>
-        <Stack sx={{ gap: "15px", margin: "10px" }}>
-          <Button
-            variant="contained"
+                      aria-label="recipe"
+                    >
+                      {user?.username[0].toUpperCase()}
+                    </Avatar>
+                  }
+                  action={
+                    <IconButton>
+                      <ExpandMoreIcon
+                        sx={{
+                          width: "30px",
+                          height: "30px",
+                          backgroundColor: "rgba(17, 25, 40, 0.5)",
+                          borderRadius: "50%",
+                          color: "white",
+                          padding: "5px",
+                        }}
+                      />
+                    </IconButton>
+                  }
+                  title={
+                    <Typography variant="h6" fontSize={14}>
+                      {user?.username}
+                    </Typography>
+                  }
+                />
+              ))}
+            </AccordionDetails>
+          </Accordion>
+          <Accordion
             sx={{
+              backgroundColor: "transparent",
+              color: "white",
               boxShadow: "0",
-              textTransform: "capitalize",
+            }}
+            disableGutters
+          >
+            <AccordionSummary
+              expandIcon={
+                <ExpandMoreIcon
+                  sx={{
+                    width: "30px",
+                    height: "30px",
+                    backgroundColor: "rgba(17, 25, 40, 0.5)",
+                    borderRadius: "50%",
+                    color: "white",
+                    padding: "5px",
+                  }}
+                />
+              }
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Shared files
+            </AccordionSummary>
+          </Accordion>
+          <Stack sx={{ gap: "15px", margin: "10px" }}>
+            <Button
+              variant="contained"
+              sx={{
+                boxShadow: "0",
+                textTransform: "capitalize",
 
-              bgcolor: "rgba(230,74,105,0.553)",
-              "&:hover": { bgcolor: "rgba(220,20,60,0.7)", boxShadow: "0" },
-            }}
-            onClick={handleBlock}
-          >
-            {isCurrentUserBlocked
-              ? "You are blocked"
-              : isReceiverBlocked
-              ? "user blocked"
-              : "block user"}
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              boxShadow: "0",
-              textTransform: "capitalize",
-              bgcolor: "#3a63cb",
-              "&:hover": { bgcolor: "#3a63cb", boxShadow: "0" },
-            }}
-            onClick={handlerLogout}
-          >
-            Logout
-          </Button>
+                bgcolor: "rgba(230,74,105,0.553)",
+                "&:hover": { bgcolor: "rgba(220,20,60,0.7)", boxShadow: "0" },
+              }}
+              onClick={handleBlock}
+            >
+              {isCurrentUserBlocked
+                ? "You are blocked"
+                : isReceiverBlocked
+                ? "user blocked"
+                : "block user"}
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                boxShadow: "0",
+                textTransform: "capitalize",
+                bgcolor: "#3a63cb",
+                "&:hover": { bgcolor: "#3a63cb", boxShadow: "0" },
+              }}
+              onClick={handlerLogout}
+            >
+              Logout
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </StyledBox>

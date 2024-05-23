@@ -38,6 +38,7 @@ type ChatStore = {
   changeChat: (chatId: string, user: User) => void;
   changeBlocked: () => void;
   chatLogOut: () => void;
+
 };
 export const useChatStore = create<ChatStore>((set) => ({
   chatId: "",

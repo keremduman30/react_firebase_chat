@@ -24,7 +24,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../libs/firebase";
 import { User, useUserStore } from "../libs/userStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const StyledTextFieldAddUser = styled(TextField)({
   "& .MuiInputBase-root": {
     backgroundColor: "white !important",
@@ -43,6 +43,12 @@ type prop = {
 };
 
 const AddUserAlert = ({ addMode, setMode }: prop) => {
+  useEffect(() => {
+    if (addMode) {
+      setSearchUsers(null);
+    }
+  }, [addMode]);
+
   const [searchUsers, setSearchUsers] = useState<User | null>(null);
 
   const { currentUser } = useUserStore();
@@ -105,6 +111,7 @@ const AddUserAlert = ({ addMode, setMode }: prop) => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          margin: { xs: "0 10%" },
         }}
       >
         <Stack
