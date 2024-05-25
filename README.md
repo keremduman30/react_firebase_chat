@@ -1,4 +1,4 @@
-# Chat Uygulaması
+# react_firebase_chat
 
 Bu proje, kullanıcıların oturum açabildiği, arkadaş ekleyebildiği, sohbet edebildiği ve kullanıcıları engelleyebildiği bir chat uygulamasıdır.
 
@@ -27,8 +27,8 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
 1. **Depoyu Klonlayın**
    
    ```bash
-   git clone https://github.com/kullaniciadi/chat-uygulamasi.git
-   cd chat-uygulamasi
+   git clone https://github.com/keremduman30/react_firebase_chat.git
+   cd react_firebase_chat
 3. **Gerekli Bağımlılıkları Yükleyin**
 
    ```bash
